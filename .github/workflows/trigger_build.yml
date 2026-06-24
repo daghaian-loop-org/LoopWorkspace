@@ -1,4 +1,4 @@
-name: 4. Build Loop 
+name: 4. Trigger Build Loop 
 run-name: Trigger Build Loop (${{ github.ref_name }})
 on:
   workflow_dispatch:
@@ -22,4 +22,4 @@ jobs:
             -H "Authorization: Bearer ${GH_PAT}" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/workflows/build_loop.yml/dispatches \
-            -d '{"ref":"${{ github.ref_name }}", "inputs": {"is_scheduled": "true"}}'
+            -d '{"ref":"${{ github.ref_name }}"}'
