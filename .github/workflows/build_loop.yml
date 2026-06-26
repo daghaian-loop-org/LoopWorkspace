@@ -1,7 +1,13 @@
-name: 5. Build Loop
+name: Triggered Loop Build
 run-name: Build Loop (${{ github.ref_name }})
 on:
   workflow_dispatch:
+    inputs:
+      is_scheduled:
+        description: 'Whether this was dispatched from the trigger scheduled workflow'
+        required: false
+        type: boolean
+        default: false
 
 env:
   GH_PAT: ${{ secrets.GH_PAT }}
@@ -153,7 +159,7 @@ jobs:
       uses: ./.github/workflows/create_certs.yml
       secrets: inherit
       if: |
-        github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.is_scheduled != 'true') ||
           (vars.SCHEDULED_BUILD != 'false' && needs.check_status.outputs.IS_SECOND_IN_MONTH == 'true') ||
           (vars.SCHEDULED_SYNC != 'false' && needs.check_status.outputs.NEW_COMMITS == 'true' )
 
@@ -166,7 +172,7 @@ jobs:
       contents: write
     if:
       | # builds with manual start; if scheduled: once a month or when new commits are found
-      github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.is_scheduled != 'true') ||
         (vars.SCHEDULED_BUILD != 'false' && needs.check_status.outputs.IS_SECOND_IN_MONTH == 'true') ||
         (vars.SCHEDULED_SYNC != 'false' && needs.check_status.outputs.NEW_COMMITS == 'true' )
     steps:
